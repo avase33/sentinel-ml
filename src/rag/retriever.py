@@ -6,7 +6,6 @@ import hashlib
 import logging
 from typing import Any
 
-import numpy as np
 from chromadb import AsyncClientAPI
 from langchain.schema import Document
 from sentence_transformers import SentenceTransformer
