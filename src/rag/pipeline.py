@@ -13,7 +13,6 @@ import logging
 import os
 import time
 from dataclasses import dataclass
-from typing import Iterator
 
 import anthropic
 from chromadb import AsyncHttpClient as ChromaAsyncClient
