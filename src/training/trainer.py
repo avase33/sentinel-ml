@@ -10,7 +10,6 @@ import argparse
 import json
 import logging
 import os
-from pathlib import Path
 
 import mlflow
 import mlflow.sklearn
@@ -19,11 +18,9 @@ import numpy as np
 import pandas as pd
 import shap
 import xgboost as xgb
-from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 from sklearn.metrics import (
     average_precision_score,
-    classification_report,
     f1_score,
     precision_score,
     recall_score,
