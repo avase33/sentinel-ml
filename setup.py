@@ -1,0 +1,51 @@
+from setuptools import find_packages, setup
+
+setup(
+    name="production-ml-platform",
+    version="1.0.0",
+    description="Production-grade ML platform: model serving, RAG, feature store, A/B testing, drift monitoring",
+    author="Akhil Vase",
+    author_email="avase896@gmail.com",
+    url="https://github.com/akhilvase/production-ml-platform",
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    python_requires=">=3.10",
+    install_requires=[
+        "fastapi>=0.111.0",
+        "uvicorn[standard]>=0.29.0",
+        "pydantic>=2.7.0",
+        "mlflow>=2.13.0",
+        "xgboost>=2.0.0",
+        "scikit-learn>=1.4.0",
+        "pandas>=2.2.0",
+        "numpy>=1.26.0",
+        "scipy>=1.13.0",
+        "openai>=1.30.0",
+        "anthropic>=0.28.0",
+        "langchain>=0.2.0",
+        "sentence-transformers>=3.0.0",
+        "chromadb>=0.5.4",
+        "redis[hiredis]>=5.0.0",
+        "asyncpg>=0.29.0",
+        "evidently>=0.4.30",
+        "shap>=0.45.0",
+        "prometheus-client>=0.20.0",
+        "httpx>=0.27.0",
+    ],
+    extras_require={
+        "dev": [
+            "pytest>=8.2.0",
+            "pytest-asyncio>=0.23.0",
+            "pytest-cov>=5.0.0",
+            "pytest-mock>=3.14.0",
+            "ruff>=0.4.0",
+            "mypy>=1.10.0",
+        ]
+    },
+    classifiers=[
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "License :: OSI Approved :: MIT License",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    ],
+)
