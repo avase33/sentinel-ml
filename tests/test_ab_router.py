@@ -2,7 +2,6 @@
 Unit tests for the A/B testing router — variant assignment and stats.
 """
 
-import pytest
 
 from src.ab_testing.router import ABRouter
 
