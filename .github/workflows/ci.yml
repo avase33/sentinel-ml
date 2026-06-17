@@ -81,5 +81,3 @@ jobs:
           context: .
           push: false
           tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
