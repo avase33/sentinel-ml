@@ -10,12 +10,10 @@ Monitors:
 On drift detection, fires a webhook to trigger automated retraining.
 """
 
-import json
 import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 import httpx
 import pandas as pd
