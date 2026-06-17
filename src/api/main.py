@@ -8,8 +8,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from prometheus_client import Counter, Histogram, make_asgi_app
-
+from prometheus_client import make_asgi_app
 from src.api.routers import ab_test, features, llm, models
 from src.monitoring.metrics import REQUEST_COUNT, REQUEST_LATENCY
 from src.serving.registry import ModelRegistry
