@@ -1,86 +1,42 @@
-"""
-Sentinel-ML -- Alert Configuration
-Define thresholds for drift and performance degradation alerts.
-"""
-
+# Alert configuration -- 2026-06-22 12:53:41
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
-from enum import Enum
-
-
-class AlertSeverity(str, Enum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    CRITICAL = "critical"
-
-
-class AlertChannel(str, Enum):
-    SLACK = "slack"
-    EMAIL = "email"
-    WEBHOOK = "webhook"
-    PAGERDUTY = "pagerduty"
-
+from typing import Dict, List
 
 @dataclass
-class DriftThreshold:
-    """Thresholds for triggering drift alerts."""
-    ks_statistic: float = 0.1
-    psi_score: float = 0.2
-    wasserstein_distance: float = 0.15
-    chi2_p_value: float = 0.05
-    feature_drift_fraction: float = 0.3
-
-
-@dataclass
-class PerformanceThreshold:
-    """Thresholds for model performance degradation."""
-    accuracy_drop: float = 0.05
-    f1_drop: float = 0.05
-    rmse_increase: float = 0.1
-    latency_p99_ms: float = 500.0
-    error_rate: float = 0.01
-
+class ThresholdConfig:
+    drift_score_threshold: float = 2.0
+    p_value_threshold: float = 0.05
+    latency_p95_ms: float = 500.0
+    latency_p99_ms: float = 1000.0
+    error_rate_threshold: float = 0.05
+    accuracy_drop_threshold: float = 0.10
+    throughput_min_rps: float = 1.0
 
 @dataclass
-class AlertConfig:
-    """Full alert configuration for a monitored model."""
+class NotificationConfig:
+    email_enabled: bool = False
+    email_recipients: List[str] = field(default_factory=list)
+    slack_enabled: bool = False
+    slack_webhook_url: str = ""
+    webhook_enabled: bool = False
+    webhook_url: str = ""
+
+@dataclass
+class SentinelConfig:
     model_id: str
-    severity: AlertSeverity = AlertSeverity.MEDIUM
-    channels: List[AlertChannel] = field(default_factory=lambda: [AlertChannel.SLACK])
-    drift: DriftThreshold = field(default_factory=DriftThreshold)
-    performance: PerformanceThreshold = field(default_factory=PerformanceThreshold)
-    cooldown_minutes: int = 60
+    thresholds: ThresholdConfig = field(default_factory=ThresholdConfig)
+    notifications: NotificationConfig = field(default_factory=NotificationConfig)
+    monitor_interval_seconds: int = 60
+    reference_window_size: int = 1000
+    current_window_size: int = 100
     enabled: bool = True
-    metadata: Dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "model_id": self.model_id,
-            "severity": self.severity.value,
-            "channels": [c.value for c in self.channels],
-            "drift_thresholds": {
-                "ks_statistic": self.drift.ks_statistic,
-                "psi_score": self.drift.psi_score,
-            },
-            "performance_thresholds": {
-                "accuracy_drop": self.performance.accuracy_drop,
-                "latency_p99_ms": self.performance.latency_p99_ms,
-            },
-            "cooldown_minutes": self.cooldown_minutes,
-            "enabled": self.enabled,
-        }
-
-
-CLASSIFICATION_CONFIG = AlertConfig(
-    model_id="default-classifier",
-    severity=AlertSeverity.HIGH,
-    channels=[AlertChannel.SLACK, AlertChannel.EMAIL],
-)
-
-REGRESSION_CONFIG = AlertConfig(
-    model_id="default-regressor",
-    severity=AlertSeverity.MEDIUM,
-    drift=DriftThreshold(wasserstein_distance=0.2),
-    performance=PerformanceThreshold(rmse_increase=0.15),
+DEFAULT_CONFIG = SentinelConfig(
+    model_id="default",
+    thresholds=ThresholdConfig(
+        drift_score_threshold=2.0,
+        p_value_threshold=0.05,
+        latency_p95_ms=500.0,
+        error_rate_threshold=0.05,
+    ),
 )
