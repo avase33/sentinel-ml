@@ -1,295 +1,229 @@
-# 🚀 Production ML Platform
-
-[![CI](https://github.com/akhilvase/production-ml-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/akhilvase/production-ml-platform/actions)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](docker-compose.yml)
-[![MLflow](https://img.shields.io/badge/MLflow-integrated-orange.svg)](https://mlflow.org)
-
-A **batteries-included, production-ready ML platform** combining real-time model serving, RAG-powered LLM gateway, online feature store, A/B testing, and full model observability — deployable in minutes via Docker Compose or Kubernetes.
-
-> Built from patterns across fintech and enterprise ML systems handling millions of daily predictions.
-
----
-
-## ✨ What's Inside
-
-| Component | Description | Tech |
-|-----------|-------------|------|
-| **Model Gateway** | FastAPI serving layer with versioned endpoints | FastAPI, Pydantic |
-| **LLM / RAG Pipeline** | Multi-provider LLM routing with vector-backed RAG | LangChain, ChromaDB, OpenAI, Anthropic |
-| **Feature Store** | Online + offline feature store with sub-10ms reads | Redis, PostgreSQL |
-| **A/B Testing Router** | Champion-challenger traffic splitting with metric tracking | Redis, Prometheus |
-| **Drift Monitor** | Statistical data drift + prediction quality monitoring | Evidently AI, Prometheus |
-| **Experiment Tracking** | Full ML lifecycle with model registry | MLflow |
-| **Observability Stack** | Metrics, dashboards, alerting | Prometheus, Grafana |
-| **CI/CD** | Automated test → build → deploy pipeline | GitHub Actions, ArgoCD |
-
----
-
-## 🏗️ Architecture
+<div align="center">
 
 ```
-                         ┌─────────────────────────────────────────┐
-                         │            API Gateway (FastAPI)         │
-                         │  /predict  /rag  /features  /ab-test    │
-                         └────────┬──────────┬────────┬────────────┘
-                                  │          │        │
-               ┌──────────────────┘          │        └──────────────────┐
-               ▼                             ▼                           ▼
-   ┌───────────────────┐       ┌─────────────────────┐      ┌──────────────────────┐
-   │  A/B Test Router  │       │    RAG Pipeline      │      │   Feature Store      │
-   │  champion 90%     │       │  Embed → Search →    │      │  Redis (online)      │
-   │  challenger 10%   │       │  Retrieve → Generate │      │  Postgres (offline)  │
-   └────────┬──────────┘       └──────────┬──────────┘      └──────────┬───────────┘
-            │                             │                             │
-            ▼                             ▼                             ▼
-   ┌────────────────┐        ┌────────────────────┐       ┌────────────────────────┐
-   │ Model Registry │        │   Vector Store      │       │   Drift Monitor        │
-   │ MLflow         │        │   ChromaDB          │       │   Evidently AI         │
-   └────────────────┘        └────────────────────┘       └──────────┬─────────────┘
-                                                                      │
-                                                          ┌───────────▼──────────────┐
-                                                          │  Prometheus + Grafana     │
-                                                          └───────────────────────────┘
+ ___            _   _            _       __  __ _
+/ __| ___ _ _ | |_(_)_ _  ___ | |     |  \/  | |
+\__ \/ -_) ' \|  _| | ' \/ -_)| |__   | |\/| | |
+|___/\___|_||_|\__|_|_||_\___||____|  |_|  |_|_|
+```
+
+### **ML Model Monitoring and Anomaly Detection**
+
+*Keep your deployed models honest. Catch drift before your users do.*
+
+<br/>
+
+[![CI](https://github.com/avase33/sentinel-ml/actions/workflows/ci.yml/badge.svg)](https://github.com/avase33/sentinel-ml/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.5-F7931E?logo=scikitlearn&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi&logoColor=white)
+![License](https://img.shields.io/badge/License-Proprietary-red)
+
+<br/>
+
+> **Sentinel-ML** is a production ML monitoring system that watches your deployed models for data drift, performance degradation, and anomalous predictions -- then fires alerts before silent failures become business problems.
+
+</div>
+
+---
+
+## The Problem
+
+ML models decay. The data distribution shifts. Users behave differently than training examples. A model that was 94% accurate last quarter is silently wrong today -- and without monitoring, no one knows.
+
+Sentinel-ML makes model health visible, measurable, and alertable.
+
+---
+
+## Feature Highlights
+
+### Data Drift Detection
+
+- Statistical tests (KS-test, Chi-squared, PSI) on input feature distributions
+- Baseline any dataset as the reference distribution
+- Continuous comparison of incoming production data against baseline
+- Per-feature drift scores with configurable thresholds
+
+### Model Performance Monitoring
+
+- Track accuracy, precision, recall, F1, RMSE, MAE over time
+- Rolling window performance: last 24h, 7d, 30d
+- Detect performance cliffs vs gradual degradation
+- Segmented analysis: performance by user cohort, geography, or feature value
+
+### Anomaly Detection
+
+- Flag predictions that fall outside expected confidence ranges
+- Isolation Forest and statistical outlier detection on prediction outputs
+- Cluster incoming samples and detect out-of-distribution inputs
+- Real-time anomaly scoring via prediction hook
+
+### Alerting
+
+- Rule-based alerts: drift score > threshold, accuracy drop > X%, anomaly rate spikes
+- Alert channels: email, Slack webhook, PagerDuty
+- Alert deduplication and cooldown periods
+- Full alert history with root cause context
+
+### Dashboard
+
+- Real-time metrics on model health across all deployed models
+- Feature importance drift visualization
+- Prediction distribution histograms
+- Exportable monitoring reports
+
+---
+
+## Architecture
+
+```
++--------------------------------------------------------------+
+|              Your Deployed Models / Services                 |
+|  Prediction hook --> POST /api/v1/log  (each prediction)    |
++------------------------+-------------------------------------+
+                         |
++------------------------v-------------------------------------+
+|                  Sentinel-ML Backend (Python)               |
+|  FastAPI - scikit-learn - pandas - scipy - numpy           |
+|                                                              |
+|  +-----------+  +----------+  +----------+  +----------+   |
+|  |   Drift   |  | Perf     |  | Anomaly  |  |  Alert   |   |
+|  |  Detector |  | Tracker  |  | Detector |  |  Engine  |   |
+|  +-----------+  +----------+  +----------+  +----------+   |
+|                           |                                  |
+|                   Celery Workers (async analysis)            |
++------------------------+-------------------------------------+
+                         |
+              PostgreSQL (time-series metrics)
+              +  Redis (queue + recent-window cache)
 ```
 
 ---
 
-## ⚡ Quick Start
+## Tech Stack
 
-### Docker Compose (recommended)
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Runtime** | Python 3.11 | Core monitoring logic |
+| **API** | FastAPI | Prediction logging + metrics endpoints |
+| **ML** | scikit-learn, scipy, numpy, pandas | Drift detection and anomaly scoring |
+| **Database** | PostgreSQL 16 | Time-series metric storage |
+| **Cache/Queue** | Redis 7, Celery | Async analysis pipeline |
+| **Dashboard** | React 18, Recharts | Metrics visualization |
+| **Alerts** | SMTP, Slack webhooks, PagerDuty API | Multi-channel notification |
+| **CI** | GitHub Actions | Lint, test, build |
+
+---
+
+## Quick Start
+
+### Option A: Docker
 
 ```bash
-git clone https://github.com/akhilvase/production-ml-platform.git
-cd production-ml-platform
-
-# Set your API keys
+git clone https://github.com/avase33/sentinel-ml.git
+cd sentinel-ml
 cp .env.example .env
-# Edit .env with your OpenAI/Anthropic keys
-
-# Launch the full stack
-make up
-
-# Verify everything is healthy
-make health
+docker compose up -d
 ```
 
-Services available at:
-- **API**: http://localhost:8000/docs
-- **MLflow UI**: http://localhost:5000
-- **Grafana**: http://localhost:3000 (admin/admin)
-- **Prometheus**: http://localhost:9090
+| Service | URL |
+|---|---|
+| Dashboard | http://localhost:3000 |
+| API | http://localhost:8000 |
+| API Docs | http://localhost:8000/docs |
 
-### Kubernetes (Helm)
+### Option B: Local Development
 
 ```bash
-helm repo add mlplatform https://akhilvase.github.io/production-ml-platform
-helm install mlplatform mlplatform/mlplatform \
-  --set openai.apiKey=$OPENAI_API_KEY \
-  --set anthropic.apiKey=$ANTHROPIC_API_KEY \
-  -f helm/mlplatform/values.yaml
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp ../.env.example .env
+uvicorn app.main:app --reload
 ```
 
 ---
 
-## 🔌 API Reference
+## Integration
 
-### Model Inference
+### Log predictions from your model
 
-```bash
-# Real-time prediction
-curl -X POST http://localhost:8000/api/v1/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model_name": "fraud_detector",
-    "features": {"amount": 150.0, "merchant_category": "electronics", "hour": 23},
-    "version": "champion"
-  }'
+```python
+import requests
 
-# Response
+# After each prediction in your model service:
+requests.post("http://sentinel:8000/api/v1/log", json={
+    "model_id": "churn-classifier-v3",
+    "inputs": {"tenure_months": 12, "monthly_charges": 65.0, "contract": "month-to-month"},
+    "prediction": 0.87,
+    "confidence": 0.91,
+    "timestamp": "2026-06-22T10:00:00Z"
+})
+```
+
+### Set a baseline
+
+```python
+# POST /api/v1/models/{model_id}/baseline
+# Body: your training dataset as JSON or CSV upload
+```
+
+### Configure alerts
+
+```python
+# POST /api/v1/alerts/rules
 {
-  "prediction": 0.87,
-  "model_version": "v2.1.0",
-  "variant": "champion",
-  "latency_ms": 12.4,
-  "request_id": "req_abc123"
+  "model_id": "churn-classifier-v3",
+  "metric": "psi_score",
+  "threshold": 0.2,
+  "channel": "slack",
+  "webhook_url": "https://hooks.slack.com/..."
 }
 ```
 
-### RAG / LLM Gateway
+---
 
-```bash
-# Query with RAG
-curl -X POST http://localhost:8000/api/v1/rag/query \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "What is the chargeback policy for recurring transactions?",
-    "collection": "compliance_docs",
-    "top_k": 5,
-    "provider": "openai"
-  }'
+## Drift Detection Methods
+
+| Method | Use Case | Statistic |
+|---|---|---|
+| **Kolmogorov-Smirnov** | Continuous features | KS statistic + p-value |
+| **Chi-Squared** | Categorical features | Chi2 statistic + p-value |
+| **PSI (Population Stability Index)** | Binary classifier inputs | PSI score (>0.2 = major drift) |
+| **Wasserstein Distance** | Distribution similarity | Earth Mover's Distance |
+| **Isolation Forest** | Prediction anomalies | Anomaly score (-1 to 1) |
+
+---
+
+## Roadmap
+
+- [ ] LLM output monitoring (hallucination detection, toxicity scoring)
+- [ ] Automated retraining trigger on drift threshold breach
+- [ ] SHAP-based feature importance shift analysis
+- [ ] A/B test monitoring: compare two model versions in production
+- [ ] Grafana integration for unified observability
+- [ ] SDK: `pip install sentinel-ml-client`
+- [ ] Multi-model correlation analysis
+- [ ] SLA breach prediction
+
+---
+
+## License
+
 ```
+Copyright (c) 2026 Akhil Vase. All rights reserved.
 
-### Feature Store
-
-```bash
-# Get online features (sub-10ms)
-curl http://localhost:8000/api/v1/features/user_123?feature_set=fraud_v2
-
-# Batch upsert features
-curl -X POST http://localhost:8000/api/v1/features/batch \
-  -H "Content-Type: application/json" \
-  -d '{"entity_id": "user_123", "features": {"tx_count_24h": 12, "avg_amount_7d": 85.5}}'
-```
-
-### A/B Testing
-
-```bash
-# Route request (auto-splits traffic)
-curl -X POST http://localhost:8000/api/v1/ab/predict \
-  -H "Content-Type: application/json" \
-  -d '{"experiment": "fraud_model_v3_test", "entity_id": "user_123", "features": {...}}'
+This source code is the proprietary property of Akhil Vase.
+Unauthorized copying, distribution, or modification is strictly prohibited.
 ```
 
 ---
 
-## 📊 Model Monitoring
+<div align="center">
 
-The platform automatically tracks:
+**Your models are deployed. Now make sure they stay right.**
 
-- **Data drift** — PSI and KL-divergence on input feature distributions
-- **Prediction drift** — Score distribution shifts over time
-- **Feature skew** — Training vs. serving distribution mismatch
-- **Business metrics** — Precision@threshold, catch rate, false positive rate
+*Sentinel-ML -- Monitor the model. Catch the drift. Fire the alert.*
 
-Drift alerts trigger **automated retraining** via the pipeline webhook.
-
-```python
-from src.monitoring.drift import DriftMonitor
-
-monitor = DriftMonitor(model_name="fraud_detector", reference_dataset="train_2024_q4")
-report = monitor.run(current_data=serving_logs_df)
-
-if report.drift_detected:
-    monitor.trigger_retraining()  # Fires GitHub Actions workflow
-```
-
----
-
-## 🧪 A/B Testing
-
-```python
-from src.ab_testing.router import ABRouter
-
-router = ABRouter(experiment_name="fraud_model_v3_test")
-
-# Define split
-router.configure(
-    champion={"model": "fraud_v2", "traffic": 0.9},
-    challenger={"model": "fraud_v3", "traffic": 0.1}
-)
-
-# Route and record
-result = router.predict(entity_id="user_123", features=features)
-router.record_outcome(request_id=result.request_id, label=actual_fraud_label)
-
-# Get stats
-stats = router.get_experiment_stats()
-# {"champion_precision": 0.931, "challenger_precision": 0.948, "p_value": 0.031}
-```
-
----
-
-## 🔁 Training Pipeline
-
-```bash
-# Train a new model with experiment tracking
-python -m src.training.trainer \
-  --model-type xgboost \
-  --dataset s3://your-bucket/features/fraud_v2/ \
-  --experiment fraud_detection_q2_2025 \
-  --register-if-better
-
-# MLflow auto-logs: params, metrics, artifacts, model card
-```
-
----
-
-## 📦 Project Structure
-
-```
-production-ml-platform/
-├── src/
-│   ├── api/                    # FastAPI app + routers
-│   │   ├── main.py
-│   │   ├── routers/
-│   │   │   ├── models.py       # /predict endpoints
-│   │   │   ├── features.py     # /features endpoints
-│   │   │   ├── llm.py          # /rag endpoints
-│   │   │   └── ab_test.py      # /ab endpoints
-│   │   └── middleware/
-│   │       └── auth.py
-│   ├── feature_store/
-│   │   ├── store.py            # Online (Redis) + offline (Postgres)
-│   │   └── pipeline.py         # Kafka → feature computation
-│   ├── training/
-│   │   ├── trainer.py          # MLflow-tracked training
-│   │   └── experiments.py      # Experiment management
-│   ├── serving/
-│   │   ├── registry.py         # MLflow model registry wrapper
-│   │   └── predictor.py        # Model loading + inference
-│   ├── monitoring/
-│   │   ├── drift.py            # Evidently AI drift detection
-│   │   └── metrics.py          # Prometheus instrumentation
-│   ├── rag/
-│   │   ├── pipeline.py         # End-to-end RAG orchestration
-│   │   ├── embeddings.py       # Embedding generation + caching
-│   │   └── retriever.py        # ChromaDB / Pinecone retrieval
-│   └── ab_testing/
-│       └── router.py           # Traffic splitting + stats
-├── helm/mlplatform/            # Kubernetes Helm chart
-├── monitoring/
-│   ├── prometheus.yml
-│   └── grafana/dashboards/     # Pre-built ML dashboards
-├── .github/workflows/
-│   ├── ci.yml                  # Test + lint on PR
-│   └── cd.yml                  # Deploy on merge to main
-├── tests/
-├── docker-compose.yml
-├── Makefile
-└── requirements.txt
-```
-
----
-
-## 🧰 Tech Stack
-
-**Core:** Python 3.10+, FastAPI, Pydantic v2  
-**ML:** XGBoost, LightGBM, PyTorch, Scikit-learn, HuggingFace Transformers  
-**LLM/RAG:** LangChain, OpenAI API, Anthropic API, ChromaDB, Sentence Transformers  
-**MLOps:** MLflow, Evidently AI, DVC  
-**Feature Store:** Redis, PostgreSQL  
-**Streaming:** Apache Kafka (optional, for high-throughput feature pipelines)  
-**Infra:** Docker, Kubernetes (EKS/AKS/GKE), Helm, Terraform  
-**Observability:** Prometheus, Grafana, Datadog-compatible metrics  
-**CI/CD:** GitHub Actions, ArgoCD  
-
----
-
-## 🤝 Contributing
-
-PRs welcome. Please open an issue first for major changes.
-
-```bash
-git clone https://github.com/akhilvase/production-ml-platform.git
-cd production-ml-platform
-pip install -e ".[dev]"
-make test
-```
-
----
-
-## 📄 License
-
-MIT © [Akhil Vase](https://linkedin.com/in/akhil-vase)
+</div>
