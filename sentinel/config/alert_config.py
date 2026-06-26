@@ -1,4 +1,4 @@
-# Alert configuration -- 2026-06-25 12:06:41
+# Alert configuration -- 2026-06-26 08:57:03
 from dataclasses import dataclass, field
 from typing import Dict, List
 
