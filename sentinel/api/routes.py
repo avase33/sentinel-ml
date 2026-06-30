@@ -1,4 +1,4 @@
-# Sentinel API routes -- 2026-06-30 12:03:44
+# Sentinel API routes -- 2026-06-30 12:04:37
 from fastapi import APIRouter, HTTPException
 from typing import Optional
 from sentinel.monitors.drift_detector import DriftDetector
