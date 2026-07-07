@@ -10,4 +10,4 @@
 - FastAPI routes: fit detector, detect drift, record predictions, get alerts
 
 ## [v1.07071351] -- 2026-07-07
-- Run: 20260707135100
+- Run: 20260707135153
