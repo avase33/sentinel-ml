@@ -1,4 +1,4 @@
-# Drift detector -- 2026-07-08 11:23:44
+# Drift detector -- 2026-07-08 11:24:47
 import numpy as np
 from scipy import stats
 from typing import List, Dict, Optional, Tuple
