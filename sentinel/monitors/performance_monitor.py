@@ -1,4 +1,4 @@
-# Performance monitor -- 2026-07-09 12:34:20
+# Performance monitor -- 2026-07-10 09:38:08
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict
@@ -10,7 +10,7 @@ class PredictionRecord:
     prediction: float
     ground_truth: Optional[float]
     latency_ms: float
-    2026-07-09 12:34:20: datetime
+    2026-07-10 09:38:08: datetime
 
 @dataclass
 class PerformanceReport:
@@ -55,7 +55,7 @@ class PerformanceMonitor:
                 alerts.append(f"Low accuracy: {accuracy:.2%}")
         now = datetime.utcnow()
         recent_window = timedelta(seconds=60)
-        recent = [r for r in self._records if now - r.2026-07-09 12:34:20 < recent_window]
+        recent = [r for r in self._records if now - r.2026-07-10 09:38:08 < recent_window]
         throughput = len(recent) / 60.0
         error_rate = len(self._errors) / max(len(self._records), 1)
         if error_rate > 0.05:
