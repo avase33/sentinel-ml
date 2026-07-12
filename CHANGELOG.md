@@ -1,6 +1,6 @@
 # Sentinel-ML Changelog
 
-## [Unreleased] -- 2026-07-11
+## [Unreleased] -- 2026-07-12
 
 ### Added
 - KS-test drift detector with configurable thresholds and severity levels
@@ -9,5 +9,5 @@
 - Full SentinelConfig dataclass with threshold and notification settings
 - FastAPI routes: fit detector, detect drift, record predictions, get alerts
 
-## [v1.07111648] -- 2026-07-11
-- Run: 20260711164837
+## [v1.07120953] -- 2026-07-12
+- Run: 20260712095352
