@@ -9,5 +9,5 @@
 - Full SentinelConfig dataclass with threshold and notification settings
 - FastAPI routes: fit detector, detect drift, record predictions, get alerts
 
-## [v1.07151449] -- 2026-07-15
-- Run: 20260715144942
+## [v1.07151451] -- 2026-07-15
+- Run: 20260715145108
