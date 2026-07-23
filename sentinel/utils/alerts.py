@@ -1,4 +1,4 @@
-# Alert system -- 2026-07-22 21:18:43
+# Alert system -- 2026-07-22 21:20:59
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional, Callable
